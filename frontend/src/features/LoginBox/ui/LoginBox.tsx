@@ -1,0 +1,60 @@
+import styled from "styled-components";
+import { Button, TextField } from "@mui/material";
+import { useRef } from "react";
+
+export const LoginBox = () => {
+  const login = useRef<HTMLInputElement>(null);
+  const password = useRef<HTMLInputElement>(null);
+
+  const sendLogin = () => {};
+
+  return (
+    <LoginFormWrapper autoComplete="off">
+      <InputLogin
+        ref={login}
+        placeholder="Введите логин"
+        variant="outlined"
+        size="small"
+        name="login"
+        autoComplete="off"
+      />
+      <InputPassword
+        ref={password}
+        placeholder="Введите пароль"
+        size="small"
+        type="password"
+        name="password"
+        variant="outlined"
+      />
+      <ButtonSubmit onClick={sendLogin} variant="contained">
+        Вход
+      </ButtonSubmit>
+    </LoginFormWrapper>
+  );
+};
+
+const LoginFormWrapper = styled.form`
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem;
+  width: 500px;
+  //height: 500px;
+  background-color: #f6f6ff;
+  border-radius: 7px;
+  border: 1px solid #eeeeff;
+  text-align: center;
+  margin: 0 auto;
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  align-items: center;
+`;
+const InputLogin = styled(TextField)`
+  width: 100%;
+`;
+const InputPassword = styled(TextField)`
+  width: 100%;
+`;
+const ButtonSubmit = styled(Button)`
+  width: 150px;
+`;
