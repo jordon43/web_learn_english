@@ -1,29 +1,12 @@
-import type { Config } from "jest";
-import { compilerOptions } from "./tsconfig.json";
-import { pathsToModuleNameMapper } from "ts-jest";
+const nextJest = require('next/jest');
+const createJestConfig = nextJest({ dir: './' });
 
-const config: Config = {
-  // ⬇︎ Babel-jest будет преобразовывать .ts/.tsx – JSX больше не «неожиданный»
-  transform: {
-    "^.+\\.(ts|tsx)$": "babel-jest",
-  },
 
-  testEnvironment: "jsdom",
-
-  // Явно сообщаем Jest, как резолвить алиас "@/..."
-  moduleNameMapper: {
-    // берём правила прямо из tsconfig
-    ...pathsToModuleNameMapper(compilerOptions.paths ?? {}, {
-      prefix: "<rootDir>/",
-    }),
-  },
-
-  // какие расширения считать модулями
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
-
-  // чтобы отчёты покрытия собирались корректно
-  collectCoverage: true,
-  coverageDirectory: "coverage",
+/** @type {import('jest').Config} */
+const customJestConfig = {
+  testEnvironment: 'jsdom',
+  moduleNameMapper: { '^@/(.*)$': '<rootDir>/src/$1' },
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
 };
 
-export default config;
+module.exports = createJestConfig(customJestConfig);

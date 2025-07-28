@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Box } from "@mui/material";
+import {positionCard} from "@/shared/types/ui";
 
 export const RootLangWrapped = styled(Box)`
   display: flex;
@@ -35,7 +36,12 @@ export const SoundButton = styled.button`
   //}
 `;
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<{$position?: positionCard}>`
+    ${({$position}) => {
+      if($position === 'left') return 'box-shadow: rgb(0 200 0 / 60%) 5px 0px 100px 0px !important;';
+      if($position === 'right') return 'box-shadow: rgb(200 0 0 / 60%) -5px 0px 100px 0px !important ;';
+    }}
+    //box-shadow: ${({$position}) =>($position === 'left' ? 'rgb(15 163 13) 5px 0px 50px 0px;' : 'rgb(15 163 13) 5px 0px 50px 0px;')};
   position: relative;
   min-height: 300px;
   min-width: 200px;

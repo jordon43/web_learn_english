@@ -1,60 +1,62 @@
-import styled from "styled-components";
-import { Button, TextField } from "@mui/material";
-import { useRef } from "react";
+"use client";
+import { useEffect, useState } from "react";
+import { useLoginUserMutation } from "@/features/LoginBox/api/loginApi";
+import { useRouter } from "next/navigation";
+import * as SC from "./styles";
 
 export const LoginBox = () => {
-  const login = useRef<HTMLInputElement>(null);
-  const password = useRef<HTMLInputElement>(null);
+  const [login, setLogin] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const router = useRouter();
 
-  const sendLogin = () => {};
+  const [loginUserMutation, { isLoading, error, isSuccess }] =
+    useLoginUserMutation();
+
+  const sendLogin = async () => {
+    try {
+      await loginUserMutation({
+        login: login,
+        password: password,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess) router.push("/words");
+  }, [isSuccess]);
 
   return (
-    <LoginFormWrapper autoComplete="off">
-      <InputLogin
-        ref={login}
+    <SC.LoginFormWrapper autoComplete="off">
+      {/*TODO типизировать ошибку*/}
+      {error?.data ?? error?.error}
+      <SC.InputLogin
+        value={login}
         placeholder="Введите логин"
         variant="outlined"
         size="small"
         name="login"
         autoComplete="off"
+        onChange={(e) => setLogin(e.target.value)}
       />
-      <InputPassword
-        ref={password}
+      <SC.InputPassword
+        value={password}
         placeholder="Введите пароль"
         size="small"
         type="password"
         name="password"
         variant="outlined"
+        onChange={(e) => setPassword(e.target.value)}
       />
-      <ButtonSubmit onClick={sendLogin} variant="contained">
+      <SC.ButtonSubmit
+        loading={isLoading}
+        disabled={isLoading}
+        onClick={sendLogin}
+        variant="contained"
+      >
         Вход
-      </ButtonSubmit>
-    </LoginFormWrapper>
+      </SC.ButtonSubmit>
+    </SC.LoginFormWrapper>
   );
 };
-
-const LoginFormWrapper = styled.form`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  gap: 0.7rem;
-  padding: 1rem;
-  width: 500px;
-  //height: 500px;
-  background-color: #f6f6ff;
-  border-radius: 7px;
-  border: 1px solid #eeeeff;
-  text-align: center;
-  margin: 0 auto;
-  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
-  align-items: center;
-`;
-const InputLogin = styled(TextField)`
-  width: 100%;
-`;
-const InputPassword = styled(TextField)`
-  width: 100%;
-`;
-const ButtonSubmit = styled(Button)`
-  width: 150px;
-`;

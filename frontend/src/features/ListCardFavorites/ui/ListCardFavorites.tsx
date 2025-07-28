@@ -1,5 +1,4 @@
 "use client";
-import { useAppSelector } from "@/shared/store/hooks";
 import { WordCardForm } from "@/entities/word/ui/WordCardForm";
 import {
   useChangeFavoriteWordMutation,

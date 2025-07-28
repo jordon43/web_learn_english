@@ -1,18 +1,8 @@
 "use client";
-import { Ref, RefObject, useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/shared/store/hooks";
-import {
-  addRepeatWord,
-  addSavedWord,
-  setAllWords,
-} from "@/entities/word/model/wordsSlice";
-import { positionCardXY } from "@/shared/types/ui";
+import { useState } from "react";
+import { useAppSelector } from "@/shared/store/hooks";
 import { CardBox } from "@/features/Card/ui/CardBox";
-import { CARD_INTERVAL_ACTION } from "@/features/Card/model/constants";
-import { WordData, WordNonFormatData } from "@/entities/word/model/types";
 import * as SC from "./styles";
-
-import { mapWords } from "@/entities/word/model/mapper";
 import { TrueChangeItem } from "@/shared/ui/TrueChangeWrapped/TrueChangeWrapped";
 import { FalseChangeItem } from "@/shared/ui/FalseChangeItem/FalseChangeItem";
 import { useCheckPositionCard } from "@/features/Card/model/hooks/useCheckPositionCard";
@@ -20,47 +10,44 @@ import {
   useAddRepeatWordMutation,
   useAddSavedWordMutation,
   useGetAllWordsQuery,
-  useGetSavedWordsQuery,
 } from "@/entities/word/api/wordApi";
+import { useDrag } from "@use-gesture/react";
+import { SpringRef, SpringValue } from "@react-spring/web";
+import { usePositionCardHook } from "@/features/SwiperWordCard/model/usePositionCardHook";
 
-const fetchMakeRepeatCard = async (data: WordData) => {
-  try {
-    const response = await fetch("http://localhost:8383/api/add-repeat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify({
-        id: data.id,
-      }),
-    });
+type DragBind = ReturnType<typeof useDrag>;
 
-    return response.json();
-  } catch (e) {
-    console.log("error", e);
-  }
-};
-
-const fetchMakeSaveCard = async (data: WordData) => {
-  try {
-    const response = await fetch("http://localhost:8383/api/add-saved", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify({
-        id: data.id,
-      }),
-    });
-
-    return response.json();
-  } catch (e) {
-    console.log("error", e);
-  }
+export type DataAnimation = {
+  x: SpringValue<number>;
+  api: SpringRef<{ x: number }>;
+  bind: DragBind;
 };
 
 export const SwiperWordCard = () => {
-  const store = useAppSelector((state) => state.wordState);
+  const wordsData = useAppSelector((state) => state.wordState.allWords);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const onDontKnow = () => {
+    console.log("onDontKnow");
+    setCurrentIndex((prev) => ++prev);
+    // if (store.allWords[0]) {
+    //   addRepeatWord({ id: store.allWords[0].id }).then(() => {
+    //     refetch();
+    //   });
+    // }
+  };
+
+  const onKnow = () => {
+    console.log("onKnow");
+    setCurrentIndex((prev) => ++prev);
+    // if (store.allWords[0]) {
+    //   addSavedWord({ id: store.allWords[0].id }).then(() => {
+    //     refetch();
+    //   });
+    // }
+  };
+
+  const { x, bind, api, zone } = usePositionCardHook(onKnow, onDontKnow);
 
   const { cardZone, setCurrentCardPosition } = useCheckPositionCard();
 
@@ -68,34 +55,22 @@ export const SwiperWordCard = () => {
   const [addRepeatWord] = useAddRepeatWordMutation();
   const [addSavedWord] = useAddSavedWordMutation();
 
-  const onDontKnow = () => {
-    if (store.allWords[0]) {
-      addRepeatWord({ id: store.allWords[0].id }).then(() => {
-        refetch();
-      });
-    }
-  };
-
-  const onKnow = () => {
-    if (store.allWords[0]) {
-      addSavedWord({ id: store.allWords[0].id }).then(() => {
-        refetch();
-      });
-    }
-  };
-
   return (
-    <SC.PageWrapped>
+    <SC.PageWrapped data-testid={"wordsPageWrapped"}>
+      {/*cardZone:{JSON.stringify(cardZone)}*/}
+      {}
       <SC.CardsWrapped>
         {!isLoading && (
           <>
             <TrueChangeItem active={cardZone === "left"} />
-            {store.allWords[0] && (
+            {wordsData[currentIndex] && (
               <CardBox
-                propsCard={store.allWords[0]}
+                propsCard={wordsData[currentIndex]}
                 setCardPositionXY={setCurrentCardPosition}
                 onDontKnow={onDontKnow}
                 onKnow={onKnow}
+                position={zone}
+                dataAnimation={{ x, bind, api }}
               />
             )}
             <FalseChangeItem active={cardZone === "right"} />

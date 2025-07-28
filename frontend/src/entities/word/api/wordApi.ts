@@ -1,16 +1,25 @@
 import { baseApi } from "@/shared/api/baseApi";
 import { WordData, WordNonFormatData } from "@/entities/word/model/types";
+import { withLoader } from "@/shared/utils/withLoader";
 
 type ParamsAddWord = {
   id: number;
 };
 
+type FetchWords = {
+  limit: number;
+  page: number;
+  rows: WordNonFormatData[];
+};
+
 export const wordApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllWords: builder.query<WordNonFormatData[], void>({
-      query: () => "/words",
-      providesTags: ["AllWords"],
-    }),
+    getAllWords: builder.query<FetchWords, void>(
+      withLoader({
+        query: () => "/words",
+        providesTags: ["AllWords"],
+      }),
+    ),
     getRepeatWords: builder.query<WordNonFormatData[], void>({
       query: () => "/get-all-repeat",
       providesTags: ["RepeatWord"],

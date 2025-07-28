@@ -15,12 +15,19 @@ const initialState: wordsState = {
   allWords: [],
 };
 
+type FetchWords = {
+  limit: number;
+  page: number;
+  rows: WordNonFormatData[]
+}
+
+
 const wordsSlices = createSlice({
   name: "words",
   initialState: initialState,
   reducers: {
-    setAllWords: (state, action: PayloadAction<WordData[]>) => {
-      state.allWords = action.payload;
+    setAllWords: (state, action: PayloadAction<FetchWords>) => {
+      state.allWords = action.payload.rows;
     },
     setRepeatWords: (state, action: PayloadAction<WordData[]>) => {
       state.repeatWords = action.payload;
@@ -37,8 +44,8 @@ const wordsSlices = createSlice({
   extraReducers: (builder) => {
     builder.addMatcher(
       wordApi.endpoints.getAllWords.matchFulfilled,
-      (state, action: PayloadAction<WordNonFormatData[]>) => {
-        state.allWords = mapWords(action.payload);
+      (state, action: PayloadAction<FetchWords>) => {
+        state.allWords = mapWords(action.payload.rows);
       },
     );
     builder.addMatcher(
